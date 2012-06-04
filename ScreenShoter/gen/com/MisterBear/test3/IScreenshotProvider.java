@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: C:\\Users\\Mister Bear\\workspace\\ScreenShoter\\src\\com\\MisterBear\\test3\\IScreenshotProvider.aidl
+ * Original file: C:\\Users\\Mister Bear\\Dropbox\\ScreenShoter\\src\\com\\MisterBear\\test3\\IScreenshotProvider.aidl
  */
 package com.MisterBear.test3;
 // Interface for fetching screenshots

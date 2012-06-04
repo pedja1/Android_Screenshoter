@@ -1,111 +1,108 @@
 package com.MisterBear.test3;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.nio.*;
 import java.security.InvalidParameterException;
-import java.util.List;
 import java.util.UUID;
 
 import android.app.Service;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.*;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.*;
 
 public class ScreenshotService extends Service {
 	
-	/*
-	 * Action name for intent used to bind to service.
-	 */
+	
+	 /// Action name for intent used to bind to service.
+	 
 	public static final String BIND = "pl.polidea.asl.ScreenshotService.BIND";  
 
-	/*
-	 * Name of the native process.
-	 */
+	
+	 /// Name of the native process.
+	 
 	private static final String NATIVE_PROCESS_NAME = "asl-native"; 
 
-	/*
-	 * Port number used to communicate with native process.
-	 */
+	
+	/// Port number used to communicate with native process.
+	
 	private static final int PORT = 42380;
 
-	/*
-	 * Timeout allowed in communication with native process.
-	 */
-	private static final int TIMEOUT = 1000;  
+     /// Timeout allowed in communication with native process.
+	 private static final int TIMEOUT = 1000;  
 
-	/*
-	 * Directory where screenshots are being saved.
-	 */
+	 /// Directory where screenshots are being saved.
+	 
 	private static String SCREENSHOT_FOLDER = "/sdcard/screens/";
 
 
-	/*
-	 * An implementation of interface used by clients to take screenshots.
-	 */
+	 /// An implementation of interface used by clients to take screenshots.
+/**
+ Provide functions to another service or activity
+ */
 	private final IScreenshotProvider.Stub mBinder = new IScreenshotProvider.Stub() {
-
+/**
+ Take Screenshot
+ */
 		public String takeScreenshot() throws RemoteException {
 			try {
 				return ScreenshotService.this.takeScreenshot();
 			}
-			catch(Exception e) { return null; }
-		}
+			catch(Exception e) {
 
+				return null; }
+		}
+		/**
+		  Check run or not native service
+		 */
 		public boolean isAvailable() throws RemoteException {
 			return isNativeRunning();
 		}
 	};
-	
+	/**
+	  When service create
+	 */
 	@Override
 	public void onCreate() {
 		Log.i("service", "Service created."); 
 	}
 
+	/**
+	  When service bind
+	 */
 	@Override
 	public IBinder onBind(Intent intent) {
+		Log.i("service", "Service bind."); 
 		return mBinder;
 	}
 
 
-	/*
-	 * Checks whether the internal native application is running,
-	 */
+	 /** Checks whether the internal native application is running,
+@return true if native service is run /false if native service is down 
+*/	
 	private boolean isNativeRunning() {
 		try {
 			Socket sock = new Socket();
-			sock.connect(new InetSocketAddress("localhost", PORT), 10);	// short timeout
+			sock.connect(new InetSocketAddress("localhost", PORT), 10);	/// short timeout
 		}
 		catch (Exception e) {
 			return false;
 		}
 		return true;
-//		ActivityManager am = (ActivityManager)getSystemService(Service.ACTIVITY_SERVICE);
-//		List<ActivityManager.RunningAppProcessInfo> ps = am.getRunningAppProcesses();
-//
-//		if (am != null) {
-//			for (ActivityManager.RunningAppProcessInfo rapi : ps) {
-//				if (rapi.processName.contains(NATIVE_PROCESS_NAME))
-//					// native application found
-//					return true;
-//			}
-//
-//		}
-//		return false;
 	}
 	
 	
-	/*
-	 * Internal class describing a screenshot.
+	
+	 /** Internal class describing a screenshot.
 	 */
 	class Screenshot {
 		public Buffer pixels;
@@ -121,8 +118,8 @@ public class ScreenshotService extends Service {
 	}
 	
 	
-	/*
-	 * Determines whether the phone's screen is rotated.
+	
+	 /** Determines whether the phone's screen is rotated.
 	 */
 	private int getScreenRotation()  {
 		WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
@@ -170,14 +167,13 @@ public class ScreenshotService extends Service {
 			
 			return orientation == 1 ? 0 : 90; // 1 for portrait, 2 for landscape
 		} catch (Exception e) {
-			return 0; // bad, I know ;P
+			return 0; 
 		}
 	}
 	
 
-	/*
-	 * Communicates with the native service and retrieves a screenshot from it
-	 * as a 2D array of bytes.
+	
+	/** Communicates with the native service and retrieves a screenshot from it 	  as a 2D array of bytes.
 	 */
 	private Screenshot retreiveRawScreenshot() throws Exception {
 		try {
@@ -209,9 +205,9 @@ public class ScreenshotService extends Service {
 				// retreive the screenshot
 				// (this method - via ByteBuffer - seems to be the fastest)
 				ByteBuffer bytes = ByteBuffer.allocate (ss.width * ss.height * ss.bpp / 8);
-				is = new BufferedInputStream(is);	// buffering is very important apparently
-				is.read(bytes.array());				// reading all at once for speed
-				bytes.position(0);					// reset position to the beginning of ByteBuffer
+				is = new BufferedInputStream(is);	/// buffering is very important apparently
+				is.read(bytes.array());				/// reading all at once for speed
+				bytes.position(0);					/// reset position to the beginning of ByteBuffer
 				ss.pixels = bytes;
 				
 				return ss;
@@ -225,9 +221,8 @@ public class ScreenshotService extends Service {
 		return null;
 	}
 
-	/*
-	 * Saves given array of bytes into image file in the PNG format.
-	 */
+	 /** Saves given array of bytes into image file in the PNG format.
+	*/
 	private void writeImageFile(Screenshot ss, String file) {
 		if (ss == null || !ss.isValid())		throw new IllegalArgumentException();
 		if (file == null || file.length() == 0)	throw new IllegalArgumentException();
@@ -235,15 +230,24 @@ public class ScreenshotService extends Service {
 		// resolve screenshot's BPP to actual bitmap pixel format
 		Bitmap.Config pf;
 		switch (ss.bpp) {
-			case 16:	pf = Config.RGB_565; break;
+			case 16:	pf = Config.ARGB_4444; break;
 			case 32:	pf = Config.ARGB_8888; break;
 			default:	pf = Config.ARGB_8888; break;
 		}
-
+		
 		// create appropriate bitmap and fill it wit data
 		Bitmap bmp = Bitmap.createBitmap(ss.width, ss.height, pf);
 		bmp.copyPixelsFromBuffer(ss.pixels);
 		
+		for(int i=0;i<ss.width;i++)
+			for(int j=0;j<ss.height;j++)
+			{
+				int newcolor=bmp.getPixel(i, j);
+				int green=Color.green(newcolor),red=Color.red(newcolor),blue=Color.blue(newcolor);
+				Log.v("color",Integer.toString(red)+" "+Integer.toString(blue)+" "+Integer.toString(green));
+				red-=180;	
+				bmp.setPixel(i, j, Color.rgb(red, green, blue));
+			}
 		// handle the screen rotation
 		int rot = getScreenRotation();
 		if (rot != 0) {
@@ -262,18 +266,19 @@ public class ScreenshotService extends Service {
 		bmp.compress(CompressFormat.PNG, 100, fos);
 	}
 
-	/*
-	 * Takes screenshot and saves to a file.
-	 */
+	
+	/** Takes screenshot and saves to a file.
+	*/
 	private String takeScreenshot() throws IOException {
 		// make sure the path to save screens exists
 		File screensPath = new File(SCREENSHOT_FOLDER);
 		screensPath.mkdirs();
-			
+		Time time = new Time();
+        time.setToNow();
 		// construct screenshot file name
 		StringBuilder sb = new StringBuilder();
 		sb.append(SCREENSHOT_FOLDER);
-		sb.append(Math.abs(UUID.randomUUID().hashCode()));	// hash code of UUID should be quite random yet short
+		sb.append(Integer.toString(time.month) +"."+ Integer.toString(time.monthDay)+"." + Integer.toString(time.hour)+"." + Integer.toString(time.minute)+"." + Integer.toString(time.second));	/// hash code of UUID should be quite random yet short
 		sb.append(".png");
 		String file = sb.toString();
 
@@ -282,7 +287,6 @@ public class ScreenshotService extends Service {
 		try {
 			ss = retreiveRawScreenshot();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		writeImageFile(ss, file);

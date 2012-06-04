@@ -4,7 +4,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="10" />
+    <uses-sdk android:minSdkVersion="8" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -12,17 +12,26 @@
         <activity
             android:name=".ScreenShoterActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-        <receiver android:name=".BroadCastReciverClass">
+        <receiver android:name=".BroadCastReciverCall">
 			 <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />     
        		 </intent-filter>
 			</receiver>
+			<receiver android:name=".BroadCastReciverowerConnected">
+			 <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />     
+       		 </intent-filter>
+			</receiver>
+        
+        <service android:name=".InitService"	 
+		    />
+        <service android:name=".ScreenshotService">
+			<intent-filter>
+				<action android:name="pl.polidea.asl.ScreenshotService.BIND" />
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+		</service>
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />

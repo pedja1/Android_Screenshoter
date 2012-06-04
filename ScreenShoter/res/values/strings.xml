@@ -4,5 +4,9 @@
     <string name="hello">Press button to make ScreenShot!</string>
     <string name="app_name">ScreenShoter</string>
     <string name="Press">Press</string>
-
+    <string name="take_screenshot">Take screenshot</string>
+    <string name="n_a">Screenshot interface not (yet) available.</string>
+    <string name="native_n_a">Native service not found.</string>
+    <string name="screenshot_error">Error while taking screenshot.</string>
+    <string name="screenshot_ok">Screenshot taken successfully.</string>
 </resources>
